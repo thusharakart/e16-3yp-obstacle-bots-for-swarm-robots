@@ -1,37 +1,35 @@
-## Welcome to GitHub Pages
+# Swarm Robotics platform
 
-You can use the [editor on GitHub](https://github.com/cepdnaclk/e16-3yp-obstacle-bots-for-swarm-robots/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+### Group Members
+   * Thushara K A R         :: E/16/369 :: e16369@eng.pdn.ac.lk
+   * Thilakarathna D M D U  :: E/16/366 :: e16366@eng.pdn.ac.lk
+   * Dissanayake D M T H    :: E/16/088 :: e16088@eng.pdn.ac.lk
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### OVERVIEW
 
-### Markdown
+In swarm robotics the major barrier is that the researchers have to do a lot of hardware implementation prior to their projects. In this particular project we are going to come up with obstacle bots for a swarm robotic arena which is a part of a swarm robots platform project which eventually solves the above mentioned problem. 
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+### GOALS
 
-```markdown
-Syntax highlighted code block
+* Automated obstacle bots monitored by an overhead camera setup.
 
-# Header 1
-## Header 2
-### Header 3
+* Bots can move to the desired positions with a user friendly interface.
 
-- Bulleted
-- List
+### SPECIFICATIONS
 
-1. Numbered
-2. List
+* Obstacle robot swarm is capable of moving every individual obstacle robot to their own destination with the consideration of  collision  avoidance. 
 
-**Bold** and _Italic_ and `Code` text
+* With the help of collision avoidance algorithms, obstacle robots can be placed in certain positions which allows the researcher to make  various obstacle shapes on the arena made out of obstacle robot combinations .
 
-[Link](url) and ![Image](src)
-```
+* Obstacles can be programmed to be static or dynamic. Dynamic obstacles can model scenarios that have a motion in the obstacle.
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+* Each robot has its own radio module  which uses a 433Mhz radio band. These modules can be used to communicate with the base station. 
 
-### Jekyll Themes
+* Each robot has two independent wheels that can perform forward, backward and turning operations. With the help of inbuilt gyroscope robots can perform accurate turning operations.
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/cepdnaclk/e16-3yp-obstacle-bots-for-swarm-robots/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+### DESIGN
+![alt text](https://github.com/cepdnaclk/e16-3yp-obstacle-bots-for-swarm-robots/blob/master/3DModel/Components/Design_Diagrams/robot_base_design.png?raw=true)
 
-### Support or Contact
+Those individual robots will be on the arena as follows
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+![alt text](https://github.com/cepdnaclk/e16-3yp-obstacle-bots-for-swarm-robots/blob/master/3DModel/Components/Design_Diagrams/robot_arena.png?raw=true)
