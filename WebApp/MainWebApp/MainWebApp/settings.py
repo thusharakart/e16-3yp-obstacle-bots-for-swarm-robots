@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'accounts',
     'swarm_interface',
+    'schedules',
 ]
 
 MIDDLEWARE = [
