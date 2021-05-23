@@ -8,12 +8,16 @@
 * Supervisor
    * Dr. Isuru Navinna
    * Mr. Ziyan Marikkar
+   * Prof. Roshan Ragel
+   * Dr. Upul Jayasinghe
 * Related links
    * [Faculty website](http://eng.pdn.ac.lk/)
    * [Department website](http://www.ce.pdn.ac.lk/)
    * [Web Application Home Page](http://3.93.215.173/)
    * [Swarm Dash Board](http://3.93.215.173/swarm/)
- ### TABLE OF CONTENT
+   * [Git Hub Repository](https://cepdnaclk.github.io/e16-3yp-obstacle-bots-for-swarm-robots/)
+
+### TABLE OF CONTENT
 
 1. >[OVERVIEW](https://github.com/cepdnaclk/e16-3yp-obstacle-bots-for-swarm-robots#overview)
 2. >[GOALS](https://github.com/cepdnaclk/e16-3yp-obstacle-bots-for-swarm-robots#goals)
@@ -63,8 +67,11 @@ In swarm robotics the major barrier is that the researchers have to do a lot of 
  
    ![MODEL](https://github.com/dtdinidu7/e16-3yp-obstacle-bots-for-swarm-robots/blob/master/docs/img/solid_full.jpg?raw=true)
    
-    [3D MODEL DEMO VIDEO](https://drive.google.com/file/d/1BgqnTfJoUTvxhPZTlfKIsdu9cmKUDJUL/view?usp=sharing)
+   [3D MODEL DEMO VIDEO](https://drive.google.com/file/d/1BgqnTfJoUTvxhPZTlfKIsdu9cmKUDJUL/view?usp=sharing)
 
+ * #### SAFTY MEASURES
+
+    ![IMERGENCY STATUS](https://github.com/dtdinidu7/e16-3yp-obstacle-bots-for-swarm-robots/blob/master/docs/img/imergency_status.gif?raw=true)
 
     
 * #### PCB DESIGN
@@ -78,8 +85,11 @@ In swarm robotics the major barrier is that the researchers have to do a lot of 
 ### WEB INTERFACE
 
   #### Web Interface
+
   [WEB INTERFACE DEMO VIDEO](https://drive.google.com/file/d/1p-WY_BGf4mX0sW0hUGA0x1Oh4LhzKp-s/view?usp=sharing)
+
   #### 3D Interface
+
   [3D INTERFACE DEMO VIDEO](https://drive.google.com/file/d/1X0jq2r_McNR5bppIPc1HjJY1mYPvrYJg/view?usp=sharing)
   
   #### Platform PC Operator GUI
@@ -95,12 +105,15 @@ In swarm robotics the major barrier is that the researchers have to do a lot of 
 ### TESTING
   
   #### Algorithm Deployment
+
   [Algorithm Deployment Video](https://drive.google.com/file/d/18J7mnoRWbKy1-WM-fGOGq0C8-KU52HCJ/view?usp=sharing)
   
   #### Web Interface Authentication And Authorization Testing
+
   [Web Interface Testing Video](https://drive.google.com/file/d/12DfR7rRFpMq2U1c6BGW0rHfQw0c6rsvO/view?usp=sharing)
   
   #### Hardware Testing
+
   [Hardware Testing Video](https://drive.google.com/file/d/1UNAkzgOKk-umYvnypkwuJJWv3zXbf69Z/view?usp=sharing)
   
 ### BUDGET
