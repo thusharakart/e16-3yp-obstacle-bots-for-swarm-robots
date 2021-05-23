@@ -1,65 +1,5 @@
-<!-- <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/home_template/assets/css/main.css" />
-    <title>3JS_interface</title>
-</head>
-<script src="https://kit.fontawesome.com/f1c65451e4.js" crossorigin></script>
-<link rel="stylesheet" href="/static/swarm/style.af07cd6d.css">
-
-<body class="body">
-    <header id="header">
-        <a class="logo" href="index.html">Swarm Robotics</a>
-        <nav>
-            <a href="#menu">Menu</a>
-        </nav>
-    </header>
-
-    <nav id="menu">
-        <ul class="links">
-            <li><a href="{% url 'home' %}">Home</a></li>
-            {% if user.is_authenticated %}
-            <li><a href="javascript:{}" onclick="document.getElementById('my_form').submit();">Logout</a></li>
-            <form id="my_form" method="post" action="{% url 'accounts:logout' %}">
-                {% csrf_token %}
-            </form>
-            {% else %}
-            <li><a href="{% url 'accounts:login' %}">Login</a></li>
-            <li><a href="{% url 'accounts:signup' %}">Signup</a></li>
-            {% endif %}
-        </ul>
-    </nav>
-    <div class="view" id="root">
-        <div class="Container camera" style="z-index:2"> <i id="CameraReset" class="fa-camera fas"></i> <i id="CameraTopView" class="fa-chevron-up fas"></i> <i id="CameraReset" class="fa-chevron-down fas"></i>
-        </div>
-        <div class="Container dest" style="z-index:2"> <i title="Set Destination" id="setDestination" class="fa-map-marker-alt fas" onclick="this.classList.toggle('active')"></i> <i id="deleteAllDestinations" class="fa-backspace fas"></i> </div>
-        <div id="batStat" class="Container batt" style="z-index:2" onclick="this.classList.toggle('active')"> Battery State </div>
-        <div id="time_remain" class="time_remain">
-            <p id="time_text" class="time_text">19:25</p>
-            <div id="time_bar" class="time_bar">
-                <div id="time_bar_fill"></div> <i class="fa-sort-up fas"></i>
-            </div>
-        </div> <i class="fa-pause-circle fas"></i>
-        <div class="Container pc" style="z-index:2"> <i id="InternetIcon" class="fa-globe-americas fas"></i> <label id="serverName" class="text1"> Platform PC UOP</label> <label id="online" class="online">
-                offline</label> </div>
-    </div>
-</body>
-<script src="/static/home_template/assets/js/jquery.min.js"></script>
-<script src="/static/home_template/assets/js/browser.min.js"></script>
-<script src="/static/home_template/assets/js/breakpoints.min.js"></script>
-<script src="/static/home_template/assets/js/util.js"></script>
-<script src="/static/home_template/assets/js/main.js"></script>
-<script src="/static/swarm/app.90953a91.js"></script>
-
-</html> -->
-
-
 <!DOCTYPE html>
-
 <html lang="en">
-
 
 <head>
     <meta charset="UTF-8">
@@ -75,7 +15,7 @@
 
 <body>
 
-    <script>
+    <!-- <script>
         navigator.mediaDevices.getUserMedia({
 
                 video: {
@@ -93,7 +33,7 @@
             .then(stream => {
                 document.getElementById("video").srcObject = stream;
             })
-    </script>
+    </script> -->
 
 
     <div class="pos-f-t">
@@ -124,7 +64,7 @@
                 <h1 style="font-weight: bold; font-style: italic; font-family:'Garamond'; font-size: 30px;">TOP VIEW OF THE SWARM PLATFORM</h1>
             </div>
             <div class="container" style=" background-color: #707174; padding: 20px;">
-                <video id="video" autoplay></video>
+                <img src="{{ url_for('video_feed') }}" width="100%" class="view">
             </div>
         </div>
 
@@ -148,8 +88,8 @@
                             <div class="progress-bar" role="progressbar" style="width: 93%;" aria-valuenow="93" aria-valuemin="0" aria-valuemax="100">93%</div>
                         </div>
                         <p> </p>
-                        <a href="#" class="btn btn-danger">STOP</a>
-                        <a href="#" class="btn btn-outline-secondary ">HOME</a>
+                        <button class="btn btn-danger">STOP</button>
+                        <button class="btn btn-outline-secondary " onclick='return HomeBot1()'>HOME</a>
                     </div>
                 </div>
             </div>
@@ -168,8 +108,8 @@
                         </div>
 
                         <p></p>
-                        <a href="#" class="btn btn-danger">STOP</a>
-                        <a href="#" class="btn btn-outline-secondary ">HOME</a>
+                        <button class="btn btn-danger">STOP</button>
+                        <button class="btn btn-outline-secondary " onclick='return HomeBot2()'>HOME</button>
                     </div>
                 </div>
             </div>
@@ -244,20 +184,20 @@
             </div>
 
             <div style="padding: 10px; ">
-                <button type="button " class="btn btn-primary " style="padding: 15px; width:100%; ">START</button>
+                <button type="button " class="btn btn-primary " style="padding: 15px; width:100%; " onclick='return start()'>START</button>
             </div>
 
             <div style="padding: 10px; ">
-                <button type=" button " class="btn btn-secondary " style="padding: 15px; width:100%;  ">PAUSE</button>
+                <button type=" button " class="btn btn-secondary " style="padding: 15px; width:100%;  " onclick='return pause()'>PAUSE</button>
             </div>
 
             <div style="padding: 10px; ">
-                <button type="button " class="btn btn-success " style="padding: 15px; width:100%; ">HOME</button>
+                <button type="button " class="btn btn-success " style="padding: 15px; width:100%; " onclick='return home()'>HOME</button>
             </div>
 
             <div style="padding: 30px; ">
                 <!-- <button type="button " class="btn btn-outline-danger " style="padding: 15px; width:100% ">STOP</button> -->
-                <button type="button" class="btn btn-danger" style="padding: 40px; text-align:center; height:2in; width:2in;  font-family:'Garamond'; border-radius:100%; font-weight:bold; font-size:35px; margin:auto; ">STOP</button>
+                <button type="button" class="btn btn-danger" style="padding: 40px; text-align:center; height:2in; width:2in;  font-family:'Garamond'; border-radius:100%; font-weight:bold; font-size:35px; margin:auto; " onclick='return stop()'>STOP</button>
             </div>
 
         </div>
@@ -265,7 +205,7 @@
 
 
     </div>
-
+    <script src="/app.js"></script>
 </body>
 
 
