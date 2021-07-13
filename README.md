@@ -1,5 +1,9 @@
 # Swarm Robotics Platform
 
+[![GitHub issues](https://img.shields.io/github/issues/cepdnaclk/e16-3yp-obstacle-bots-for-swarm-robots?style=for-the-badge)](https://github.com/cepdnaclk/e16-3yp-obstacle-bots-for-swarm-robots/issues)
+
+[![GitHub forks](https://img.shields.io/github/forks/cepdnaclk/e16-3yp-obstacle-bots-for-swarm-robots)](https://github.com/cepdnaclk/e16-3yp-obstacle-bots-for-swarm-robots/network)
+
 ### Team
 * Members
    * Thushara K A R         :: E/16/369 :: [e16369@eng.pdn.ac.lk](e16369@eng.pdn.ac.lk)
@@ -16,6 +20,8 @@
    * [Swarm Dash Board](http://3.93.215.173/swarm/)
    * [Faculty website](http://eng.pdn.ac.lk/)
    * [Department website](http://www.ce.pdn.ac.lk/)
+   * [Design Manual](https://github.com/cepdnaclk/e16-3yp-obstacle-bots-for-swarm-robots/blob/master/Documentation/DesignManual.pdf)
+   * [User Manual](https://github.com/cepdnaclk/e16-3yp-obstacle-bots-for-swarm-robots/blob/master/Documentation/UserManual.pdf)
 
  
 ### OVERVIEW
