@@ -1,7 +1,7 @@
 import paho.mqtt.client as mqtt #import the client1
 import movements
 from robot import robot
-from encrypt import aesEncrypt, aesEncryptString, aesDecrypt
+# from encrypt import aesEncrypt, aesEncryptString, aesDecrypt
 from roboArrangement import  arrageBot
 import random 
 import math
@@ -58,19 +58,19 @@ def battStat():
 # on message function
 def on_message(client, userdata, message):
     # newBotDecode = BotPositionArr.FromString(message.payload)
-    decrypted = aesDecrypt(message.payload).decode('utf-8')
-
+    decrypted = message.payload.decode('utf-8')
+    print(decrypted)
     try:
         messageString = decrypted.split(';')
         if message.topic == TOPIC_COM:
             if messageString[1] == 'get_servers':
                 print('client requests server name')
-                client.publish(TOPIC_COM, aesEncryptString('server_name_response;'+str(SWARM_ID)+';'+swarm_name))
+                client.publish(TOPIC_COM, 'server_name_response;'+str(SWARM_ID)+';'+swarm_name)
         
         if message.topic == TOPIC_SEVER_COM:
             if messageString[1] == 'connection_req':
                 print('client requests connection')
-                client.publish(TOPIC_SEVER_COM, aesEncryptString('server_response;success;'+ json.dumps({'bot_count':BOT_COUNT, 'areana_dim':ARENA_DIM})))
+                client.publish(TOPIC_SEVER_COM, 'server_response;success;'+ json.dumps({'bot_count':BOT_COUNT, 'areana_dim':ARENA_DIM}))
 
             if messageString[1] == 'set_dest':
                 print("Destination reset")
@@ -79,10 +79,10 @@ def on_message(client, userdata, message):
                 arrageBot(robots_data , destinations)
 
             if messageString[1] == 'ping':
-                client.publish(TOPIC_SEVER_COM, aesEncryptString('ping'))
+                client.publish(TOPIC_SEVER_COM, 'ping')
             
             if messageString[1] == 'battStat':
-                client.publish(TOPIC_SEVER_COM, aesEncryptString('battStat;' + battStat()))
+                client.publish(TOPIC_SEVER_COM, 'battStat;' + battStat())
     except :
         print("message format error")
 # brocker ip address (this brokeris running inside our aws server)
@@ -113,8 +113,7 @@ stableCount = 0
 while(True):
     maxForce = 0
     time.sleep(0.2)
-    
-    
+        
     if stableCount<20:
         newBotPosArr = BotPositionArr()
         result = movements.action(robots_data)
@@ -141,8 +140,9 @@ while(True):
             if maxForce < F:
                 maxForce = F
         data = newBotPosArr.SerializeToString()
-        client.publish(TOPIC_SEVER_BOT_POS, aesEncrypt(data))
-        print("maxForce: " , maxForce)
+        client.publish(TOPIC_SEVER_BOT_POS, data)
+        
+        # print("maxForce: " , maxForce)
     else:
         print("Finished")
         newBotPosArr = BotPositionArr()
@@ -157,7 +157,7 @@ while(True):
             newBotPosArr.positions.append(newBot)        
             
         data = newBotPosArr.SerializeToString()
-        client.publish(TOPIC_SEVER_BOT_POS, aesEncrypt(data))
+        client.publish(TOPIC_SEVER_BOT_POS, data)
     
     
     if maxForce < 1e-20:

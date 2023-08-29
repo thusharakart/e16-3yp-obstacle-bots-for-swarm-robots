@@ -62,8 +62,8 @@ function init() {
     controls.update();
 
     //add a point light
-    const light1 = new THREE.PointLight(0xffffff, 2, 1000);
-    light1.position.set(-15, 20, -15);
+    const light1 = new THREE.PointLight(0xffffff, 2000, 1000);
+    light1.position.set(0, 20, 0);
     light1.shadow.bias = 0.00001;
     light1.shadow.mapSize.width = 1024 * 2;
     light1.shadow.mapSize.height = 1024 * 2;
@@ -92,8 +92,8 @@ function init() {
 
     //the light used to highlight the bot
     botLight = new THREE.PointLight(0x05f3ff, 20, 2);
-    botLight.position.set(0, 1.5, 0);
-    botLight.shadow.bias = 0.00001;
+    botLight.position.set(0, 0, 0);
+    // botLight.shadow.bias = 0.00001;
     // scene.add(botLight);
 
     scene.add(new AxesHelper(50));
