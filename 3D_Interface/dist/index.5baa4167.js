@@ -1160,7 +1160,6 @@ function onMessageArrived(message_) {
             }
         }
     } catch  {
-        console.log(message_.payloadString);
         console.log("message Error / decryption error");
     }
 }

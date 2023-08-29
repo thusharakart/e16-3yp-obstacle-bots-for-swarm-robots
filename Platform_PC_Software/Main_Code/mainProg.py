@@ -48,7 +48,7 @@ serialComEn = False
 ipCamEn = True
 kalmanEn = False
 flaskEn = False
-cv2WindowEn = False
+cv2WindowEn = True
 
 
 # TODO: to be used in future 
@@ -278,8 +278,10 @@ def camProcess(sharedData):
             conData = convert(markerCorners[i][0])
             frame = cv2.circle(frame, tuple(conData[0]), 1, (255,0,0), 2)
 
-            frame = cv2.circle(frame, tuple(markerCorners[i][0][1]), 1, (0,255,0), 2)
-            frame = cv2.circle(frame, tuple(markerCorners[i][0][2]), 1, (0,0,255), 2)
+            
+
+            frame = cv2.circle(frame, (int(markerCorners[i][0][1][0]), int(markerCorners[i][0][1][1])), 1, (0,255,0), 2)
+            frame = cv2.circle(frame, (int(markerCorners[i][0][2][0]), int(markerCorners[i][0][2][1])), 1, (0,0,255), 2)
 
             # add to the marker id set
             markerSet.add(markerIds[i][0])
