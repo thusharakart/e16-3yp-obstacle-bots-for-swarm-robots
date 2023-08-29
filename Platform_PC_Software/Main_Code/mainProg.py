@@ -7,23 +7,25 @@ from kalman import kalman
 from positioning_algo import positions  
 import json
 import serial
-from multiprocessing import Process, Manager
+from multiprocessing import Process, Manager, freeze_support
 from serialCom import readSerialData, sendToSerial, serialAutoSend
 import movements
 from robot import robot
 import paho.mqtt.client as mqtt #import the client1
-from encrypt import aesEncrypt, aesEncryptString, aesDecrypt
+from threading import Thread
+# from encrypt import aesEncrypt, aesEncryptString, aesDecrypt
 import json
+
 from roboArrangement import  arrageBot
 from MQTT_msg_pb2 import *
 from flaskServing import *
 from helpFunc import *
 
 # swarm id
-SWARM_ID = 0;
+SWARM_ID = 0
 swarm_name = "platformPC UOP"
-BOT_COUNT = 2;
-ARENA_DIM = 30;
+BOT_COUNT = 2
+ARENA_DIM = 30
 
 TOPIC_COM = 'swarm/common'
 TOPIC_SEVER_COM = 'swarm/' + str(SWARM_ID) + '/com'
@@ -42,20 +44,16 @@ dispWidth = 640
 dispHeight = 480
 
 # Settings section
-serialComEn = True
+serialComEn = False
 ipCamEn = True
 kalmanEn = False
-flaskEn = True
+flaskEn = False
 cv2WindowEn = False
+
 
 # TODO: to be used in future 
 # important variables
-manager = Manager()
-sharedData = manager.list()
-sharedData.append("") # json string
-sharedData.append("") # json string
-sharedData.append(False) # sharedData[2] is the serial broatcasting enable
-sharedData.append("")
+
 
 # com port of the device
 comPort = '/dev/ttyUSB0'
@@ -69,7 +67,7 @@ if serialComEn:
     ser.flushInput()   
 
 if ipCamEn:
-    cam = cv2.VideoCapture('http://192.168.1.5:8081/video') # video source to capture images
+    cam = cv2.VideoCapture('http://192.168.1.4:8080/video') # video source to capture images
 else:
     cam = cv2.VideoCapture(0) # video source to capture images
 
@@ -80,11 +78,16 @@ robotDataSet = set()
 # position dictonary to bradcast
 broadcastPos = {}
 
-#Load the dictionary that was used to generate the markers.
-dictionary = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_250)
 
+#Load the dictionary that was used to generate the markers.
+dictionary = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
 # Initialize the detector parameters using default values
-parameters =  cv2.aruco.DetectorParameters_create()
+parameters =  cv2.aruco.DetectorParameters()
+
+detector = cv2.aruco.ArucoDetector(dictionary, parameters)
+
+# dictionary = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_250)
+# parameters =  cv2.aruco.DetectorParameters_create()
 
 def battStat():
     batt_lvls = {}
@@ -98,20 +101,20 @@ def battStat():
 def on_message(client, userdata, message):
     global BOT_COUNT
     # newBotDecode = BotPositionArr.FromString(message.payload)
-    decrypted = aesDecrypt(message.payload).decode('utf-8')
+    decrypted = message.payload.decode('utf-8')
 
     try:
         messageString = decrypted.split(';')
         if message.topic == TOPIC_COM:
             if messageString[1] == 'get_servers':
                 print('client requests server name')
-                client.publish(TOPIC_COM, aesEncryptString('server_name_response;'+str(SWARM_ID)+';'+swarm_name))
+                client.publish(TOPIC_COM, 'server_name_response;'+str(SWARM_ID)+';'+swarm_name)
         
         if message.topic == TOPIC_SEVER_COM:
             if messageString[1] == 'connection_req':
                 BOT_COUNT = len(robotData)
                 print('client requests connection', {'bot_count':BOT_COUNT, 'areana_dim':ARENA_DIM})
-                client.publish(TOPIC_SEVER_COM, aesEncryptString('server_response;success;'+ json.dumps({'bot_count':BOT_COUNT, 'areana_dim':ARENA_DIM})), qos = 2)
+                client.publish(TOPIC_SEVER_COM, 'server_response;success;'+ json.dumps({'bot_count':BOT_COUNT, 'areana_dim':ARENA_DIM}), qos = 2)
 
             if messageString[1] == 'set_dest':
                 print("Destination reset")
@@ -121,10 +124,10 @@ def on_message(client, userdata, message):
                 arrageBot(robotData , destinations)
 
             if messageString[1] == 'ping':
-                client.publish(TOPIC_SEVER_COM, aesEncryptString('ping;'))
+                client.publish(TOPIC_SEVER_COM, 'ping;')
             
             if messageString[1] == 'battStat':
-                client.publish(TOPIC_SEVER_COM, aesEncryptString('battStat;' + battStat()))
+                client.publish(TOPIC_SEVER_COM, 'battStat;' + battStat())
     except Exception as e :
         # pass
         print("message format error", e)
@@ -133,18 +136,20 @@ def on_message(client, userdata, message):
 #outVid = cv2.VideoWriter('videos/recordings.avi', cv2.VideoWriter_fourcc(*'XVID'),  frameRate, (dispWidth, dispHeight))
 
 # homing sequence
-def homeBots():
+def homeBots(sharedData):
+    
     homing_seq = sharedData[3]
     if homing_seq:
         # print('home', homing_seq)
         destinations = json.loads(homing_seq)
         arrageBot(robotData , destinations)
+        print(sharedData)
         sharedData[3] = ""
 
 # calculate destinations
-def destinationCalculation(robots, broadcastPos, frame, client):
+def destinationCalculation(robots, broadcastPos, frame, client, sharedData):
     # check homing sequence
-    homeBots()
+    homeBots(sharedData)
     # create a array to store protobuf information
     newBotPosArr = BotPositionArr()
 
@@ -220,13 +225,14 @@ def destinationCalculation(robots, broadcastPos, frame, client):
 
     # publishing data to mqtt
     data = newBotPosArr.SerializeToString()
-    # print(data)
-    client.publish(TOPIC_SEVER_BOT_POS, aesEncrypt(data))
+    
+
+    client.publish(TOPIC_SEVER_BOT_POS, data)
     
     return broadcastPos
 
 
-def camProcess():
+def camProcess(sharedData):
     # brocker ip address (this brokeris running inside our aws server)
     broker_address= "broker.mqttdashboard.com"
     print("creating new instance")
@@ -251,13 +257,13 @@ def camProcess():
     # desX = 400
     # desY = 50
 
-    global sharedData, broadcastPos
+    global broadcastPos
     print("Cam Process Started")
     while True:
         ret, frame = cam.read()    
 
         # Detect the markers in the image8
-        markerCorners, markerIds, rejectedCandidates = cv2.aruco.detectMarkers(frame, dictionary, parameters=parameters)
+        markerCorners, markerIds, rejectedCandidates = detector.detectMarkers(frame)
 
         # current marker id set
         markerSet = set()
@@ -321,11 +327,10 @@ def camProcess():
                 broadcastPos[id] = positions([kalVal[0], kalVal[1]], [[kalVal[2], kalVal[3]] , [kalVal[4], kalVal[5]]], [desX, desY], 0)
 
         # calculate destinations    
-        broadcastPos = destinationCalculation(robotData, broadcastPos, frame, client)
+        broadcastPos = destinationCalculation(robotData, broadcastPos, frame, client, sharedData)
 
         try:
             # print(broadcastPos[1][0], desX, desY)
-
             # add destination
             if (19 in robotData and True):
                 desX = robotData[19][0][0]
@@ -333,7 +338,6 @@ def camProcess():
         except:
             pass
                 
-        #print(jsonEncodedData)
 
         # addig to the shared variable
         sharedData[0] = broadcastPos
@@ -356,11 +360,21 @@ def camProcess():
 
 
 # main programme
+
+
 if __name__ == '__main__':
+    
+    manager = Manager()
+    sharedData = manager.list()
+    sharedData.append("") # json string
+    sharedData.append("") # json string
+    sharedData.append(False) # sharedData[2] is the serial broatcasting enable
+    sharedData.append("")
+
     # adding the cam process to the pool
-    p1 = Process(target=camProcess)
-    # reading recived data from the arduino
-    # p2 = Process(target=readSerialData, args=(ser,sharedData))
+    p1 = Process(target=camProcess, args=(sharedData,))
+    p1.start()
+   
     # flask Thread
     if flaskEn:
         p2 = Process(target=flaskThread, args=(sharedData,))
@@ -368,7 +382,7 @@ if __name__ == '__main__':
     if serialComEn:
         p3 = Process(target=serialAutoSend, args=(ser, sharedData))
 
-    p1.start()  
+    # p1.start()  
     if flaskEn: 
         p2.start() 
     if serialComEn:
@@ -379,3 +393,7 @@ if __name__ == '__main__':
         p2.join() 
     if serialComEn:
         p3.join()
+    
+
+
+        
