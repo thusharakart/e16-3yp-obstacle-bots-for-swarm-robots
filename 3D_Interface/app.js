@@ -126,11 +126,8 @@ function init() {
 
     // start the animation of the internet Icon
     animateInternetIcon()
-
     
 }
-
-
 
 function initRobots() {
     //load the STL object to the scene

@@ -15,6 +15,8 @@ import paho.mqtt.client as mqtt #import the client1
 from threading import Thread
 # from encrypt import aesEncrypt, aesEncryptString, aesDecrypt
 import json
+from inspect import currentframe, getframeinfo
+from config import *
 
 from roboArrangement import  arrageBot
 from MQTT_msg_pb2 import *
@@ -35,8 +37,11 @@ robots_data = []
 newBotPosArr = BotPositionArr()
 
 # image resolutions
-img_x = 640
-img_y = 480 
+img_x = None
+img_y = None 
+
+# region of intrest : {start_x, start_y, end_x, end_y}
+ROI = config['ROI']
 
 # parameters for saving the video
 frameRate = 21
@@ -44,7 +49,7 @@ dispWidth = 640
 dispHeight = 480
 
 # Settings section
-serialComEn = False
+serialComEn = True
 ipCamEn = True
 kalmanEn = False
 flaskEn = False
@@ -56,15 +61,11 @@ cv2WindowEn = True
 
 
 # com port of the device
-comPort = '/dev/ttyUSB0'
+comPort = 'COM6'
+
 
 # flags
 desReachedFlag = False
-
-# making the connection with the seral port
-if serialComEn:
-    ser = serial.Serial(comPort, 9600, timeout=1, rtscts=1) # connecting to the serial port
-    ser.flushInput()   
 
 if ipCamEn:
     cam = cv2.VideoCapture('http://192.168.1.4:8080/video') # video source to capture images
@@ -143,7 +144,7 @@ def homeBots(sharedData):
         # print('home', homing_seq)
         destinations = json.loads(homing_seq)
         arrageBot(robotData , destinations)
-        print(sharedData)
+        
         sharedData[3] = ""
 
 # calculate destinations
@@ -189,17 +190,19 @@ def destinationCalculation(robots, broadcastPos, frame, client, sharedData):
         frame = cv2.line(frame, (int(robots_data[i].init_pos[0]), int(robots_data[i].init_pos[1])), tuple(robots_data[i].des_pos), (0,255,0), 2)
         frame = cv2.line(frame, (int(robots_data[i].init_pos[0]), int(robots_data[i].init_pos[1])), (int(robots_data[i].init_pos[0]+dx), int(robots_data[i].init_pos[1]+dy)), (0,0,255), 2)
 
+        cv2.rectangle(frame, (ROI['start_x'], ROI['start_y']), (ROI['end_x'], ROI['end_y']), (200, 255,0), 1)
         # calculate the broadcast positions
         broadcastPos[keys[i]] = positions(robots[keys[i]][0], robots[keys[i]][3], [robots_data[i].init_pos[0] + dx, robots_data[i].init_pos[1] + dy], 0)
 
         # prepare data to send through mqtt
         newBot = BotPosition()
         newBot.bot_id = i
-        newBot.x_cod = robots_data[i].init_pos[0]/img_x*30 
-        newBot.y_cod = robots_data[i].init_pos[1]/img_y*30
+        newBot.x_cod = robots_data[i].init_pos[0]/(ROI['end_x']-ROI['start_x'])*30 
+        newBot.y_cod = robots_data[i].init_pos[1]/(ROI['end_x']-ROI['start_x'])*30
         newBot.angle = 0
         newBotPosArr.positions.append(newBot)
-
+       
+        
         # print(distanceTwoPoints((int(robots_data[i].init_pos[0]), int(robots_data[i].init_pos[1])), tuple(robots_data[i].des_pos)))
         if 40<distanceTwoPoints((int(robots_data[i].init_pos[0]), int(robots_data[i].init_pos[1])), tuple(robots_data[i].des_pos)):
             countDesReach += 1
@@ -223,10 +226,9 @@ def destinationCalculation(robots, broadcastPos, frame, client, sharedData):
     else:
         desReachedFlag = False
 
+    
     # publishing data to mqtt
     data = newBotPosArr.SerializeToString()
-    
-
     client.publish(TOPIC_SEVER_BOT_POS, data)
     
     return broadcastPos
@@ -257,10 +259,10 @@ def camProcess(sharedData):
     # desX = 400
     # desY = 50
 
-    global broadcastPos
+    global broadcastPos, img_x, img_y
     print("Cam Process Started")
     while True:
-        ret, frame = cam.read()    
+        ret, frame = cam.read() 
 
         # Detect the markers in the image8
         markerCorners, markerIds, rejectedCandidates = detector.detectMarkers(frame)
@@ -277,8 +279,6 @@ def camProcess(sharedData):
             # converting to center point
             conData = convert(markerCorners[i][0])
             frame = cv2.circle(frame, tuple(conData[0]), 1, (255,0,0), 2)
-
-            
 
             frame = cv2.circle(frame, (int(markerCorners[i][0][1][0]), int(markerCorners[i][0][1][1])), 1, (0,255,0), 2)
             frame = cv2.circle(frame, (int(markerCorners[i][0][2][0]), int(markerCorners[i][0][2][1])), 1, (0,0,255), 2)
@@ -343,9 +343,11 @@ def camProcess(sharedData):
 
         # addig to the shared variable
         sharedData[0] = broadcastPos
-
+        
         if cv2WindowEn:
-            cv2.imshow('Cam', frame)
+            
+            view = cv2.resize(frame, (frame.shape[1]//2, frame.shape[0]//2))
+            cv2.imshow('Cam', view)
         ret, buffer = cv2.imencode('.jpg', frame)
         img = buffer.tobytes()
         sharedData[1] = img
@@ -365,30 +367,38 @@ def camProcess(sharedData):
 
 
 if __name__ == '__main__':
+    # making the connection with the seral port
+    # if serialComEn:
+    
     
     manager = Manager()
     sharedData = manager.list()
     sharedData.append("") # json string
     sharedData.append("") # json string
-    sharedData.append(False) # sharedData[2] is the serial broatcasting enable
+    sharedData.append(True) # sharedData[2] is the serial broatcasting enable
     sharedData.append("")
 
+    # sharedData = list(["","",True,""])
+    
     # adding the cam process to the pool
     p1 = Process(target=camProcess, args=(sharedData,))
     p1.start()
-   
     # flask Thread
     if flaskEn:
         p2 = Process(target=flaskThread, args=(sharedData,))
-    # send data to the arduino
-    if serialComEn:
-        p3 = Process(target=serialAutoSend, args=(ser, sharedData))
 
     # p1.start()  
     if flaskEn: 
         p2.start() 
+
+    # send data to the arduino
+    if serialComEn:
+        p3 = Process(target=serialAutoSend, args=(sharedData,))
+    
     if serialComEn:
         p3.start()   
+
+    
 
     p1.join()  
     if flaskEn: 

@@ -1,8 +1,7 @@
 import math
+from config import *
 
-img_x = 640
-img_y = 480 
-
+ROI = config['ROI']
 
 # distance calculation
 def distanceTwoPoints(p1, p2):
@@ -11,8 +10,8 @@ def distanceTwoPoints(p1, p2):
 # remapping destinations
 def remapDes(arr):
     for data in arr:
-        data['x'] = int(data['x']/30*img_x)
-        data['y'] = int(data['y']/30*img_y)
+        data['x'] = int(data['x']/30*(ROI['end_x']-ROI['start_x'])+ ROI['start_x']) 
+        data['y'] = int(data['y']/30*(ROI['end_x']-ROI['start_x'])+ ROI['start_y'])
 
 # finction to convert for points to center point + angle
 def convert(points):

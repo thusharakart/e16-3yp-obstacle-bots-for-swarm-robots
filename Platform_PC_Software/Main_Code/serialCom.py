@@ -1,5 +1,6 @@
+
 import time
-import json
+import serial
 
 # function to read the data from the serial
 def readSerialData(ser, sharedData):   
@@ -23,21 +24,23 @@ def sendToSerial(ser, data):
     ser.write(data.encode())
 
 # this function is triggered periodicaly to broadcast data
-def serialAutoSend(ser, sharedData):
+def serialAutoSend(sharedData):
+    
     interval = 0.25 # frequency the data to be sent in seconds
-
+    ser = serial.Serial("COM6", 9600, timeout=1) # connecting to the serial port
+    ser.flushInput()   
     while True:
         # send if the operator GUI enabled
         if sharedData[2]:
             # sendToSerial(ser, sharedData[0])
+            
             for key in sharedData[0]:
-                #print(key, sharedData[0][key])
+                # print(key, sharedData[0][key])
 
                 # creating a String
                 data = str(key) + ',' + ','.join(map(str, sharedData[0][key])) + ','
-                print("data ",data)
+                print("UART send:", data)
 
                 # sending data through serial
-                sendToSerial(ser, data)
-
+                # sendToSerial(ser, data)
                 time.sleep(interval)

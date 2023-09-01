@@ -4,3 +4,4 @@
 .vscode/
 ./3D_Interface/.parcel-cache
 ./3D_Interface/node_modules
+./3D_Interface/dist
