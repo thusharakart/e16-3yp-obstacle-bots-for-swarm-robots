@@ -121,6 +121,9 @@ In swarm robotics the major barrier is that the researchers have to do a lot of 
 ### BUDGET
   ![BUDGET](https://github.com/dtdinidu7/e16-3yp-obstacle-bots-for-swarm-robots/blob/master/docs/img/budget.png?raw=true)
 
+### FUNDING
+  This project was funded by the Prof. Suhada Jayasuriya Project Support Fund through ![PEFAA](https://pefaa.net/).
+  ![funding](https://user-images.githubusercontent.com/11540782/154018492-d90b1ad1-440f-42c8-b649-14526f6da3f4.png)
 ### FINAL DEMO VIDEO
   [Final Demo Video](https://drive.google.com/file/d/1B5mBls3YdkssftkCu0zrgztlk1W86l-X/view?usp=sharing)
   

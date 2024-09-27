@@ -64,12 +64,14 @@ export function onMessageArrived(message_) {
     try {
 
         if (message_.topic == TOPIC_SEVER_BOT_POS) {
-            let s = messages.BotPositionArr.deserializeBinary(decrypt(message_.payloadBytes));
+
+            let s = messages.BotPositionArr.deserializeBinary(message_.payloadBytes);
             mqtt_data = s.getPositionsList()
             newData = true;
 
         } else {
-            let messageString = decryptString(message_.payloadBytes).split(';')
+            
+            let messageString = message_.payloadString.split(';')
             // if (message_.topic == TOPIC_COM) {
             //     if (messageString[0] == "server_name_response") {
             //         serverList[messageString[1]] = [messageString[1], messageString[2]]
@@ -78,6 +80,7 @@ export function onMessageArrived(message_) {
             // }
 
             if (message_.topic == TOPIC_SEVER_COM) {
+                
                 if (messageString[0] == "server_response") {
                     if (messageString[1] == "success") {
                         console.log("server connecion success", messageString[2])
@@ -99,6 +102,7 @@ export function onMessageArrived(message_) {
 
 
     } catch {
+        
         console.log("message Error / decryption error")
     }
 }
@@ -141,8 +145,8 @@ export function onConnectionLost(response) {
 
 export function publish(topic, message) {
     if (connected) {
-        var encrypted = encryptString(message)
-        var payload = new MQTT.Message(encrypted);
+        // var encrypted = encryptString(message)
+        var payload = new MQTT.Message(message);
         payload.destinationName = topic;
         mqtt_client.send(payload);
     }
